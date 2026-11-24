@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAKUGA — ordinary controls that react like anime</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--sk-ink:#0b0b10;--sk-panel:#14141c;--sk-line:#2a2a38;--sk-paper:#f5efe0;--sk-accent:#ff3b30;--sk-hit:#ffd400;--sk-cool:#22d3ee}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--sk-ink);color:var(--sk-paper);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle,#ffffff0d 1.2px,transparent 1.6px) 0 0/16px 16px;z-index:0}
+#fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:50}
+#app{position:relative;z-index:1}
+.disp{font-family:"Bowlby One",Impact,sans-serif;font-weight:400;letter-spacing:.01em}
+/* hero */
+.hero{min-height:92vh;display:grid;place-items:center;text-align:center;padding:80px 20px 60px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:-20%;background:repeating-conic-gradient(from 0deg at 50% 52%,#ffffff10 0 1.2deg,transparent 1.2deg 6deg);mask:radial-gradient(circle at 50% 52%,transparent 18%,#000 70%);-webkit-mask:radial-gradient(circle at 50% 52%,transparent 18%,#000 70%);z-index:-1}
+.kicker{display:inline-block;background:var(--sk-hit);color:#000;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;padding:6px 14px;transform:rotate(-2deg);border:2px solid #000;box-shadow:4px 4px 0 #000}
+h1{font-size:clamp(68px,17vw,210px);line-height:.9;margin:26px 0 8px;color:var(--sk-paper);-webkit-text-stroke:3px #000;text-shadow:7px 7px 0 var(--sk-accent),14px 14px 0 #000;transform:rotate(-3deg);cursor:pointer;user-select:none;transition:text-shadow .2s}
+.sub{font-size:clamp(18px,2.6vw,26px);max-width:640px;margin:22px auto 34px;color:#d8d2c2}
+.sub b{color:var(--sk-hit)}
+.cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.sk-btn{font:400 18px "Bowlby One",Impact,sans-serif;background:var(--sk-accent);color:#fff;border:3px solid #000;border-radius:14px;padding:14px 28px;box-shadow:0 6px 0 #000;cursor:pointer;transition:transform .08s,box-shadow .08s;text-decoration:none;display:inline-block}
+.sk-btn:active{transform:translateY(5px);box-shadow:0 1px 0 #000}
+.sk-btn.alt{background:var(--sk-paper);color:#000}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+.stats span{border:2px solid var(--sk-line);background:#0b0b10cc;border-radius:999px;padding:6px 16px;font-size:14px;font-weight:600}
+.stats b{color:var(--sk-hit)}
+/* sections */
+section{max-width:1180px;margin:0 auto;padding:70px 20px}
+h2{font-size:clamp(34px,6vw,64px);line-height:1;margin-bottom:12px}
+.lead{color:#b9b4a6;max-width:620px;margin-bottom:34px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:26px}
+.card{background:var(--sk-panel);border:2px solid var(--sk-line);border-radius:18px;padding:22px;position:relative;box-shadow:6px 6px 0 var(--sk-accent);transition:transform .2s cubic-bezier(.34,1.8,.64,1)}
+.card:hover{transform:translate(-3px,-3px) rotate(-.4deg)}
+.num{position:absolute;top:-16px;right:16px;background:var(--sk-hit);color:#000;font:400 15px "Bowlby One";padding:4px 12px;border:2px solid #000;transform:rotate(4deg)}
+.card h3{font:400 22px "Bowlby One";margin-bottom:4px}
+.card p{font-size:14px;color:#a9a496;margin-bottom:18px}
+.tag{color:var(--sk-cool);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.stage{min-height:92px;display:flex;align-items:center;justify-content:center;gap:14px;background:#0b0b10;border:2px dashed var(--sk-line);border-radius:12px;padding:18px;position:relative;flex-wrap:wrap}
+/* controls */
+.tg{width:80px;height:42px;border-radius:42px;background:var(--sk-line);border:3px solid #000;position:relative;cursor:pointer;transition:background .2s}
+.tg i{position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;border:2px solid #000;transition:transform .45s cubic-bezier(.34,2,.64,1)}
+.tg[aria-checked=true]{background:var(--sk-accent)}.tg[aria-checked=true] i{transform:translateX(38px)}
+.ck{display:flex;align-items:center;gap:12px;cursor:pointer;font-weight:600;position:relative}
+.ck input{position:absolute;opacity:0;width:28px;height:28px}
+.ck span.b{width:30px;height:30px;border:3px solid #000;background:var(--sk-line);border-radius:8px;display:grid;place-items:center;transition:background .15s}
+.ck input:checked+span.b{background:var(--sk-hit)}
+.ck input:checked+span.b::after{content:"";width:8px;height:15px;border:solid #000;border-width:0 4px 4px 0;transform:rotate(45deg) translate(-1px,-2px)}
+.ck input:focus-visible+span.b,.sk-btn:focus-visible,.tg:focus-visible,.tab:focus-visible,.selb:focus-visible,.heart:focus-visible,.stp:focus-visible{outline:3px solid var(--sk-cool);outline-offset:3px}
+.rng{width:100%}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:12px;border-radius:10px;background:var(--sk-line);border:2px solid #000;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;background:var(--sk-accent);border:3px solid #000;cursor:grab}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--sk-accent);border:3px solid #000;cursor:grab}
+input[type=range]:focus-visible{outline:3px solid var(--sk-cool);outline-offset:6px}
+.val{font:400 20px "Bowlby One";color:var(--sk-hit);min-width:44px;text-align:right}
+.txt{width:100%;background:#000;color:var(--sk-paper);border:3px solid var(--sk-line);border-radius:12px;padding:13px 16px;font:600 16px Inter;outline:none;transition:border-color .15s}
+.txt:focus{border-color:var(--sk-accent)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);position:relative;width:100%;border-bottom:3px solid var(--sk-line)}
+.tab{background:none;border:0;color:#8d8878;font:400 15px "Bowlby One";padding:12px 6px;cursor:pointer}
+.tab[aria-selected=true]{color:var(--sk-paper)}
+.ind{position:absolute;left:0;bottom:-3px;height:6px;width:33.333%;background:var(--sk-accent);border:2px solid #000;transition:transform .5s cubic-bezier(.34,1.9,.64,1)}
+.sel{position:relative;width:100%}
+.selb{width:100%;display:flex;justify-content:space-between;background:var(--sk-cool);color:#000;border:3px solid #000;border-radius:12px;padding:12px 16px;font:400 16px "Bowlby One";cursor:pointer;box-shadow:0 5px 0 #000}
+.sel ul{list-style:none;padding:0;position:absolute;top:calc(100% + 10px);left:0;right:0;background:#000;border:3px solid var(--sk-cool);border-radius:12px;overflow:hidden;display:none;z-index:5}
+.sel ul.open{display:block}
+.sel li{padding:11px 16px;cursor:pointer;font-weight:600}
+.sel li:hover,.sel li:focus{background:var(--sk-cool);color:#000;outline:none}
+.heart{background:none;border:0;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--sk-paper);font:400 22px "Bowlby One"}
+.heart svg{width:54px;height:54px;fill:var(--sk-line);stroke:#000;stroke-width:1.6;transition:fill .15s}
+.heart[aria-pressed=true] svg{fill:#ff4d8d}
+.stp{width:48px;height:48px;border-radius:12px;border:3px solid #000;background:var(--sk-hit);font:400 26px "Bowlby One";cursor:pointer;box-shadow:0 4px 0 #000;line-height:1}
+.stp:active{transform:translateY(3px);box-shadow:0 1px 0 #000}
+.cnt{font:400 44px "Bowlby One";min-width:70px;text-align:center;display:inline-block}
+.chip{display:flex;align-items:center;gap:10px;background:var(--sk-paper);color:#000;border:3px solid #000;border-radius:12px;padding:10px 14px;font-weight:700;box-shadow:4px 4px 0 var(--sk-accent)}
+.chip button{background:#000;color:#fff;border:0;border-radius:8px;padding:6px 12px;font:600 13px Inter;cursor:pointer}
+.tw{position:relative;display:inline-block}
+.tip{position:absolute;bottom:calc(100% + 14px);left:50%;background:var(--sk-hit);color:#000;font-weight:700;font-size:14px;padding:8px 14px;border:3px solid #000;border-radius:12px;white-space:nowrap;opacity:0;pointer-events:none;transform:translateX(-50%) scale(.4);transform-origin:50% 120%;transition:opacity .12s,transform .4s cubic-bezier(.34,2.2,.64,1)}
+.tip::after{content:"";position:absolute;top:100%;left:50%;margin-left:-8px;border:8px solid transparent;border-top-color:#000}
+.tw.on .tip{opacity:1;transform:translateX(-50%) scale(1)}
+#ov{position:fixed;inset:0;background:#000000b8;display:none;place-items:center;z-index:40;padding:20px}
+#dlg{background:var(--sk-paper);color:#000;border:4px solid #000;border-radius:20px;padding:30px;max-width:420px;width:100%;box-shadow:10px 10px 0 var(--sk-accent)}
+#dlg h4{font:400 30px "Bowlby One";margin-bottom:8px}
+#dlg p{margin-bottom:22px}
+/* theme strip */
+.theme{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--sk-panel);border:2px solid var(--sk-line);border-radius:16px;padding:20px 24px}
+.sw{width:44px;height:44px;border-radius:50%;border:4px solid #000;cursor:pointer;transition:transform .3s cubic-bezier(.34,2,.64,1)}
+.sw:hover{transform:scale(1.18)}
+code{background:#000;border:1px solid var(--sk-line);border-radius:6px;padding:2px 8px;color:var(--sk-hit);font-size:13px}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.three div{border-left:5px solid var(--sk-accent);padding:4px 0 4px 18px}
+.three h5{font:400 18px "Bowlby One";margin-bottom:4px}
+.three p{color:#a9a496;font-size:14px}
+footer{text-align:center;color:#8d8878;font-size:14px;padding:50px 20px 80px;border-top:2px solid var(--sk-line)}
+footer a{color:var(--sk-hit)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="app">
+
+<header class="hero">
+  <div>
+    <span class="kicker">UI controls · drawn, not rendered</span>
+    <h1 class="disp" id="title">SAKUGA</h1>
+    <p class="sub">Twelve ordinary controls that <b>react like anime</b> — squash, overshoot, smoke, impact bursts, slashes and manga sound effects.</p>
+    <div class="cta">
+      <a class="sk-btn" href="#controls" id="go">See the twelve</a>
+      <a class="sk-btn alt" href="#tweaks">Tweak the colors</a>
+    </div>
+    <div class="stats"><span><b>12</b> controls</span><span><b>1</b> file each</span><span><b>0</b> dependencies</span><span><b>1</b> canvas for all FX</span></div>
+  </div>
+</header>
+
+<section id="controls">
+  <span class="tag">Live demos</span>
+  <h2 class="disp">Go on. Poke them.</h2>
+  <p class="lead">Every card below is a real, working control. Click, drag, type, hover — each one hits back.</p>
+  <div class="grid">
+
+    <article class="card"><span class="num">01</span><span class="tag">Impact</span><h3>Button</h3><p>Squashes on press, then detonates a burst and a DON! on release.</p>
+      <div class="stage"><button class="sk-btn" id="c1">Punch it</button></div></article>
+
+    <article class="card"><span class="num">02</span><span class="tag">Slash</span><h3>Toggle</h3><p>The thumb overshoots while a blade cuts clean across the switch.</p>
+      <div class="stage"><button class="tg" id="c2" role="switch" aria-checked="false" aria-label="Power"><i></i></button></div></article>
+
+    <article class="card"><span class="num">03</span><span class="tag">Sparkle pop</span><h3>Checkbox</h3><p>Tick it and the box pops with a cyan starburst.</p>
+      <div class="stage"><label class="ck"><input type="checkbox" id="c3"><span class="b"></span>Accept the mission</label></div></article>
+
+    <article class="card"><span class="num">04</span><span class="tag">Smoke trail</span><h3>Slider</h3><p>The thumb kicks up dust as you drag; release lands a ZUUN!</p>
+      <div class="stage"><input class="rng" id="c4" type="range" min="0" max="100" value="30" aria-label="Power level"><span class="val" id="c4v">30</span></div></article>
+
+    <article class="card"><span class="num">05</span><span class="tag">Keystroke sparks</span><h3>Text input</h3><p>Every key shakes the field and throws sparks at the caret.</p>
+      <div class="stage"><input class="txt" id="c5" placeholder="Type a battle cry…" autocomplete="off" aria-label="Battle cry"></div></article>
+
+    <article class="card"><span class="num">06</span><span class="tag">Wipe</span><h3>Tabs</h3><p>A slash wipes the bar while the underline springs to its new home.</p>
+      <div class="stage"><div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true">Rush</button><button class="tab" role="tab" aria-selected="false">Guard</button><button class="tab" role="tab" aria-selected="false">Burst</button><span class="ind"></span></div></div></article>
+
+    <article class="card"><span class="num">07</span><span class="tag">Splash</span><h3>Dropdown</h3><p>Opens in a spray of droplets; options hop in one by one.</p>
+      <div class="stage" style="min-height:220px;align-items:flex-start"><div class="sel"><button class="selb" id="selBtn" aria-haspopup="listbox" aria-expanded="false"><span id="selTxt">Choose a skill</span><span>▾</span></button><ul id="selList" role="listbox"><li tabindex="0" role="option">Dash Strike</li><li tabindex="0" role="option">Water Slash</li><li tabindex="0" role="option">Rising Fist</li></ul></div></div></article>
+
+    <article class="card"><span class="num">08</span><span class="tag">Heartbeat</span><h3>Like</h3><p>A thumping pink burst and DOKI! every time you fall for it.</p>
+      <div class="stage"><button class="heart" id="c8" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.7 4.5c2 0 3.6 1.1 5.3 3 1.7-1.9 3.300-3 5.300-3 3.800 0 5.800 4 4.300 7.300C19.500 16.400 12 21 12 21z"/></svg><span id="c8n">128</span></button></div></article>
+
+    <article class="card"><span class="num">09</span><span class="tag">Counter</span><h3>Stepper</h3><p>The number gets slammed up or down with a little floating hit.</p>
+      <div class="stage"><button class="stp" id="dn" aria-label="Decrease">−</button><span class="cnt" id="cn">3</span><button class="stp" id="up" aria-label="Increase">+</button></div></article>
+
+    <article class="card"><span class="num">10</span><span class="tag">Poof</span><h3>Delete</h3><p>Items don't disappear. They explode into a smoke cloud.</p>
+      <div class="stage"><div class="chip" id="chip">enemy_01.png <button id="del">Vanish</button></div></div></article>
+
+    <article class="card"><span class="num">11</span><span class="tag">Pop-in</span><h3>Tooltip</h3><p>Springs out of nowhere with rubbery overshoot. Hover, focus or tap.</p>
+      <div class="stage" style="padding-top:44px"><span class="tw" id="tw"><button class="sk-btn alt" id="c11" style="font-size:15px;padding:11px 22px">What's this?</button><span class="tip" role="tooltip">Hidden technique unlocked!</span></span></div></article>
+
+    <article class="card"><span class="num">12</span><span class="tag">Slam</span><h3>Modal</h3><p>Crashes in from above. The whole page shakes on impact.</p>
+      <div class="stage"><button class="sk-btn" id="c12">Open modal</button></div></article>
+
+  </div>
+</section>
+
+<section id="tweaks">
+  <span class="tag">Tweakable</span>
+  <h2 class="disp">Retheme in one click.</h2>
+  <p class="lead">Every color is a CSS variable, so the whole look is a one-line override. Pick an accent — the page, and every burst, follows.</p>
+  <div class="theme">
+    <strong>Accent</strong>
+    <button class="sw" style="background:#ff3b30" data-c="#ff3b30" aria-label="Red"></button>
+    <button class="sw" style="background:#ff8a00" data-c="#ff8a00" aria-label="Orange"></button>
+    <button class="sw" style="background:#a855f7" data-c="#a855f7" aria-label="Violet"></button>
+    <button class="sw" style="background:#22c55e" data-c="#22c55e" aria-label="Green"></button>
+    <button class="sw" style="background:#3b82f6" data-c="#3b82f6" aria-label="Blue"></button>
+    <code>:root { --sk-accent: <span id="hex">#ff3b30</span>; }</code>
+  </div>
+</section>
+
+<section>
+  <span class="tag">Under the hood</span>
+  <h2 class="disp">Built to be dropped in.</h2>
+  <p class="lead">No framework, no build step, no weight.</p>
+  <div class="three">
+    <div><h5>One file each</h5><p>Each control is self-contained. Copy one, ship one.</p></div>
+    <div><h5>Zero dependencies</h5><p>Plain HTML, CSS and JavaScript. Nothing to install or update.</p></div>
+    <div><h5>One canvas</h5><p>All smoke, bursts, splashes and slashes draw on a single canvas over the page.</p></div>
+    <div><h5>Motion-safe</h5><p>Effects switch off entirely when a visitor prefers reduced motion.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p class="disp" style="font-size:22px;color:var(--sk-paper);margin-bottom:8px">SAKUGA</p>
+  <p>Concept from <a href="https://github.com/finktheartist/sakuga-vfx" target="_blank" rel="noopener">Sakuga VFX</a> by <a href="https://x.com/crtvTeknologist" target="_blank" rel="noopener">@crtvTeknologist</a> (MIT). Demos on this page are original re-creations of the idea — grab the real controls from the repo.</p>
+</footer>
+</div>
+
+<div id="ov" role="dialog" aria-modal="true" aria-labelledby="dt"><div id="dlg"><h4 id="dt">Critical hit!</h4><p>That's how a modal should arrive. Press Esc or the button to dismiss.</p><button class="sk-btn" id="mc">Nice</button></div></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const cv=$('#fx'),ctx=cv.getContext('2d');let W,H;
+function rs(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;ctx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',rs);rs();
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fx=[];let run=false,last=0;
+function add(o){if(RM)return;o.t=0;fx.push(o);if(!run){run=true;last=performance.now();requestAnimationFrame(loop)}}
+function loop(n){const dt=Math.min(.05,(n-last)/1000);last=n;ctx.clearRect(0,0,W,H);
+ for(let i=fx.length-1;i>=0;i--){const f=fx[i];f.t+=dt;if(f.t>=f.dur){fx.splice(i,1);continue}f.draw(f.t/f.dur,f.t)}
+ if(fx.length)requestAnimationFrame(loop);else{run=false;ctx.clearRect(0,0,W,H)}}
+const acc=()=>getComputedStyle(document.documentElement).getPropertyValue('--sk-accent').trim()||'#ff3b30';
+const ctr=el=>{const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,r}};
+const R=Math.random;
+function burst(x,y,col,n=16,size=1){col=col||acc();const rays=[...Array(n)].map((_,i)=>({a:i/n*6.283+R()*.3,l:(30+R()*50)*size}));
+ add({dur:.55,draw(p){const e=1-Math.pow(1-p,3);ctx.save();ctx.translate(x,y);ctx.globalAlpha=1-p;
+  if(p<.5){ctx.fillStyle='#fff';ctx.beginPath();const Rr=(28+30*e)*size*(1-p*1.4);for(let i=0;i<16;i++){const r=i%2?Rr*.45:Rr,a=i/16*6.283;ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r)}ctx.closePath();ctx.fill()}
+  ctx.strokeStyle=col;ctx.lineCap='round';
+  for(const r of rays){const r0=(16+34*e)*size,r1=r0+r.l*(1-p)*.8+4;ctx.lineWidth=Math.max(.5,(1-p)*6*size);ctx.beginPath();ctx.moveTo(Math.cos(r.a)*r0,Math.sin(r.a)*r0);ctx.lineTo(Math.cos(r.a)*r1,Math.sin(r.a)*r1);ctx.stroke()}
+  ctx.restore()}})}
+function smoke(x,y,n=7,col='#cfcfd8'){const ps=[...Array(n)].map(()=>({dx:(R()-.5)*70,dy:-20-R()*55,r:12+R()*16,d:R()*.15}));
+ add({dur:.9,draw(p){ctx.save();for(const q of ps){const pp=Math.max(0,Math.min(1,(p-q.d)/(1-q.d)));if(pp<=0)continue;const e=1-Math.pow(1-pp,2);ctx.globalAlpha=(1-pp)*.9;ctx.fillStyle=col;ctx.strokeStyle='#0b0b10';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(x+q.dx*e,y+q.dy*e,q.r*(.6+e*1.6),0,6.283);ctx.fill();ctx.stroke()}ctx.restore()}})}
+function splash(x,y,col='#22d3ee',n=14){const ps=[...Array(n)].map(()=>({vx:(R()-.5)*260,vy:-(120+R()*220),r:2+R()*4}));
+ add({dur:.8,draw(p,t){ctx.save();ctx.fillStyle=col;ctx.strokeStyle='#0b0b10';ctx.lineWidth=1.5;ctx.globalAlpha=1-p*p;for(const q of ps){ctx.beginPath();ctx.arc(x+q.vx*t,y+q.vy*t+700*t*t,q.r*(1-p*.5),0,6.283);ctx.fill();ctx.stroke()}ctx.restore()}})}
+function slash(x1,y1,x2,y2,col='#fff'){add({dur:.35,draw(p){const e=1-Math.pow(1-p,4),hx=x1+(x2-x1)*e,hy=y1+(y2-y1)*e,tp=Math.max(0,e-.45),tx=x1+(x2-x1)*tp,ty=y1+(y2-y1)*tp,nx=-(y2-y1),ny=x2-x1,L=Math.hypot(nx,ny)||1,w=7*(1-p),mx=(tx+hx)/2,my=(ty+hy)/2;
+ ctx.save();ctx.globalAlpha=1-p*p;ctx.fillStyle=col;ctx.shadowColor=col;ctx.shadowBlur=14;ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(mx+nx/L*w,my+ny/L*w);ctx.lineTo(hx,hy);ctx.lineTo(mx-nx/L*w,my-ny/L*w);ctx.closePath();ctx.fill();ctx.restore()}})}
+function speed(x,y){const ls=[...Array(30)].map(()=>({a:R()*6.283,r0:120+R()*120,l:60+R()*180}));
+ add({dur:.4,draw(p){ctx.save();ctx.globalAlpha=(1-p)*.8;ctx.strokeStyle='#fff';ctx.lineWidth=2;for(const l of ls){const r0=l.r0+p*200,r1=r0+l.l*(1-p);ctx.beginPath();ctx.moveTo(x+Math.cos(l.a)*r0,y+Math.sin(l.a)*r0);ctx.lineTo(x+Math.cos(l.a)*r1,y+Math.sin(l.a)*r1);ctx.stroke()}ctx.restore()}})}
+function sfx(x,y,txt,col='#ffd400',rot=(R()-.5)*.5,sz=44){x=Math.max(70,Math.min(W-70,x));
+ add({dur:.9,draw(p){const s=p<.18?p/.18*1.35:p<.3?1.35-(p-.18)/.12*.35:1;ctx.save();ctx.translate(x,y-p*24);ctx.rotate(rot);ctx.scale(s,s);ctx.globalAlpha=p>.7?1-(p-.7)/.3:1;
+  ctx.font=`400 ${sz}px "Bowlby One",Impact,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
+  ctx.lineWidth=sz/4;ctx.strokeStyle='#0b0b10';ctx.strokeText(txt,3,4);ctx.lineWidth=sz/7;ctx.strokeStyle='#fff';ctx.strokeText(txt,0,0);ctx.fillStyle=col;ctx.fillText(txt,0,0);ctx.restore()}})}
+function squash(el,a=.78){if(RM)return;el.animate([{transform:'scale(1,1)'},{transform:`scale(${1+(1-a)*1.2},${a})`,offset:.2},{transform:`scale(${a+.1},${1+(1-a)*1.4})`,offset:.45},{transform:'scale(1.04,.97)',offset:.7},{transform:'scale(1,1)'}],{duration:480,easing:'ease-out'})}
+function shake(el,m=8){if(RM)return;el.animate([{transform:'translate(0,0)'},{transform:`translate(${m}px,${-m/2}px)`},{transform:`translate(${-m}px,${m/2}px)`},{transform:`translate(${m/2}px,${m/3}px)`},{transform:'translate(0,0)'}],{duration:300})}
+
+/* hero */
+const title=$('#title');
+title.onclick=()=>{const c=ctr(title);burst(c.x,c.y,null,22,1.8);sfx(c.x,c.y-c.r.height*.7,'ZUUUN!','#ffd400',-.1,60);shake($('#app'),10);squash(title,.85)};
+setTimeout(()=>{const c=ctr(title);speed(c.x,c.y);burst(c.x,c.y,'#ffd400',22,1.8);sfx(c.x+80,c.y-c.r.height*.65,'DON!','#ff3b30',-.1,64);shake($('#app'),10)},500);
+$('#go').addEventListener('click',()=>{const c=ctr($('#go'));burst(c.x,c.y,null,12)});
+
+/* 01 button */
+$('#c1').onclick=e=>{const b=e.currentTarget,c=ctr(b);squash(b,.72);burst(c.x,c.y);sfx(c.x,c.y-44,'DON!')};
+/* 02 toggle */
+$('#c2').onclick=e=>{const b=e.currentTarget,on=b.getAttribute('aria-checked')!=='true';b.setAttribute('aria-checked',on);const r=b.getBoundingClientRect();
+ slash(r.left-50,on?r.top-30:r.bottom+30,r.right+50,on?r.bottom+30:r.top-30);sfx(r.left+r.width/2,r.top-30,on?'ZAN!':'SHU…','#fff',.12,34)};
+/* 03 checkbox */
+$('#c3').onchange=e=>{const s=e.target.nextElementSibling;if(e.target.checked){const c=ctr(s);burst(c.x,c.y,'#22d3ee',12,.7);sfx(c.x+10,c.y-34,'PIKI!','#22d3ee',-.15,30);squash(s,.7)}};
+/* 04 slider */
+const sl=$('#c4'),sv=$('#c4v');let lt=0;
+sl.oninput=()=>{sv.textContent=sl.value;const r=sl.getBoundingClientRect(),f=(sl.value-sl.min)/(sl.max-sl.min),x=r.left+15+f*(r.width-30);const n=performance.now();if(n-lt>70){lt=n;smoke(x,r.top+6,3)}};
+sl.onchange=()=>{const r=sl.getBoundingClientRect();sfx(r.left+r.width/2,r.top-28,'ZUUN!','#ff3b30',-.06,32)};
+/* 05 input */
+const ti=$('#c5');
+ti.addEventListener('keydown',e=>{const r=ti.getBoundingClientRect();if(e.key==='Enter'){sfx(r.left+r.width/2,r.top-26,'KIN!','#ffd400',-.08,34);burst(r.right-30,r.top+r.height/2,null,14,.8);return}
+ if(e.key.length===1){const x=Math.min(r.right-20,r.left+18+ti.value.length*9.5);burst(x,r.top+r.height/2,'#ffd400',6,.35);shake(ti,2.5)}});
+/* 06 tabs */
+const tabs=$$('.tab'),ind=$('.ind');
+tabs.forEach((t,i)=>t.onclick=()=>{if(t.getAttribute('aria-selected')==='true')return;tabs.forEach(x=>x.setAttribute('aria-selected',x===t));ind.style.transform=`translateX(${i*100}%)`;
+ const r=$('.tabs').getBoundingClientRect();slash(r.left-20,r.top-10,r.right+20,r.bottom+10);squash(t,.88)});
+/* 07 dropdown */
+const sb=$('#selBtn'),sList=$('#selList');
+sb.onclick=e=>{e.stopPropagation();const o=sList.classList.toggle('open');sb.setAttribute('aria-expanded',o);
+ if(o){const r=sb.getBoundingClientRect();splash(r.left+r.width/2,r.bottom);if(!RM)[...sList.children].forEach((li,i)=>li.animate([{transform:'translateY(-12px) scale(.9)',opacity:0},{transform:'none',opacity:1}],{duration:280,delay:i*60,easing:'cubic-bezier(.34,1.8,.64,1)',fill:'backwards'}))}};
+function pick(li){$('#selTxt').textContent=li.textContent;sList.classList.remove('open');sb.setAttribute('aria-expanded',false);const c=ctr(sb);splash(c.x,c.y+10,'#22d3ee',10);sfx(c.x,c.y-36,'ZAP!','#22d3ee',-.1,32);squash(sb,.9);sb.focus()}
+sList.onclick=e=>{const li=e.target.closest('li');if(li)pick(li)};
+sList.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick(e.target)}};
+document.addEventListener('click',()=>{sList.classList.remove('open');sb.setAttribute('aria-expanded',false)});
+/* 08 like */
+const hb=$('#c8'),hn=$('#c8n');let likes=128;
+hb.onclick=()=>{const on=hb.getAttribute('aria-pressed')!=='true';hb.setAttribute('aria-pressed',on);likes+=on?1:-1;hn.textContent=likes;const s=hb.querySelector('svg'),c=ctr(s);
+ if(on){burst(c.x,c.y,'#ff4d8d',20,1);sfx(c.x+30,c.y-40,'DOKI!','#ff4d8d',.1,34);squash(s,.6)}else squash(s,.9)};
+/* 09 stepper */
+const cn=$('#cn');let n=3;
+const step=d=>{n+=d;cn.textContent=n;const c=ctr(cn);squash(cn,d>0?.7:.85);burst(c.x,c.y,d>0?'#ffd400':'#22d3ee',8,.5);sfx(c.x,c.y-34,d>0?'+1':'−1',d>0?'#ffd400':'#22d3ee',(R()-.5)*.3,30)};
+$('#up').onclick=()=>step(1);$('#dn').onclick=()=>step(-1);
+/* 10 delete */
+const chip=$('#chip');let busy=false;
+$('#del').onclick=()=>{if(busy)return;busy=true;const c=ctr(chip);smoke(c.x,c.y,9);sfx(c.x,c.y-34,'BOFU!','#cfcfd8',.08,34);
+ if(!RM)chip.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.15)',opacity:1,offset:.25},{transform:'scale(0)',opacity:0}],{duration:420,easing:'ease-in'});
+ setTimeout(()=>chip.style.visibility='hidden',RM?0:400);
+ setTimeout(()=>{chip.style.visibility='visible';if(!RM)chip.animate([{transform:'scale(0)'},{transform:'scale(1.2)',offset:.6},{transform:'scale(1)'}],{duration:450,easing:'ease-out'});busy=false},1700)};
+/* 11 tooltip */
+const tw=$('#tw'),tb=$('#c11');
+const tipOn=()=>{if(tw.classList.contains('on'))return;tw.classList.add('on');const c=ctr(tw.querySelector('.tip'));sfx(c.x,c.y-34,'?!','#ff3b30',-.1,32)};
+tb.addEventListener('pointerenter',tipOn);tb.addEventListener('focus',tipOn);
+tb.addEventListener('pointerleave',()=>tw.classList.remove('on'));tb.addEventListener('blur',()=>tw.classList.remove('on'));
+tb.onclick=()=>{tipOn();const c=ctr(tb);burst(c.x,c.y,'#ffd400',10,.7)};
+/* 12 modal */
+const ov=$('#ov'),dlg=$('#dlg'),mo=$('#c12');
+function openM(){ov.style.display='grid';if(!RM){ov.animate([{opacity:0},{opacity:1}],{duration:150});dlg.animate([{transform:'translateY(-110vh) rotate(-6deg)'},{transform:'translateY(0) rotate(0)',offset:.6},{transform:'translateY(14px) scale(1.04,.94)',offset:.75},{transform:'translateY(-6px)',offset:.9},{transform:'none'}],{duration:620,easing:'ease-in'})}
+ setTimeout(()=>{const r=dlg.getBoundingClientRect(),x=r.left+r.width/2;speed(x,r.top+r.height/2);burst(x,r.bottom-10,'#ffd400',20,1.4);sfx(x,Math.max(50,r.top-14),'DOGOON!','#ff3b30',-.08,52);shake($('#app'),12)},RM?0:380);$('#mc').focus()}
+function closeM(){ov.style.display='none';mo.focus()}
+mo.onclick=openM;$('#mc').onclick=()=>{const c=ctr($('#mc'));burst(c.x,c.y,null,12,.8);squash($('#mc'),.75);setTimeout(closeM,150)};
+addEventListener('keydown',e=>{if(e.key==='Escape'&&ov.style.display==='grid')closeM()});
+ov.addEventListener('click',e=>{if(e.target===ov)closeM()});
+/* theme */
+$$('.sw').forEach(s=>s.onclick=()=>{document.documentElement.style.setProperty('--sk-accent',s.dataset.c);$('#hex').textContent=s.dataset.c;const c=ctr(s);burst(c.x,c.y,s.dataset.c,14,.8);sfx(c.x,c.y-40,'PAF!',s.dataset.c,-.1,30);squash(s,.7)});
+</script>
+</body>
+</html>
